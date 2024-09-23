@@ -7,6 +7,7 @@ package com.werapan.databaseproject.ui;
 import com.werapan.databaseproject.model.User;
 import com.werapan.databaseproject.service.UserService;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -16,7 +17,8 @@ import javax.swing.table.AbstractTableModel;
 public class UserPanel extends javax.swing.JPanel {
 
     private final UserService userService;
-    private final List<User> list;
+    private List<User> list;
+    private User edittedUser;
 
     /**
      * Creates new form UserPanel
@@ -24,28 +26,29 @@ public class UserPanel extends javax.swing.JPanel {
     public UserPanel() {
         initComponents();
         userService = new UserService();
-        
+
         list = userService.getUsers();
         tblUser.setModel(new AbstractTableModel() {
-            String[] columnNames = {"ID", "Login", "Name","Password", "Gender", "Role"};
+            String[] columnNames = {"ID", "Login", "Name", "Password", "Gender", "Role"};
+
             @Override
             public String getColumnName(int column) {
                 return columnNames[column];
             }
-            
+
             @Override
             public int getRowCount() {
-               return list.size();
+                return list.size();
             }
 
             @Override
             public int getColumnCount() {
-               return 6;
+                return 6;
             }
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-                
+
                 User user = list.get(rowIndex);
                 switch (columnIndex) {
                     case 0:
@@ -65,9 +68,9 @@ public class UserPanel extends javax.swing.JPanel {
                 }
             }
         });
-        
+
         enableForm(false);
-        
+
     }
 
     /**
@@ -172,9 +175,19 @@ public class UserPanel extends javax.swing.JPanel {
 
         btnSave.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnClear.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -279,9 +292,19 @@ public class UserPanel extends javax.swing.JPanel {
 
         btnEdit.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnEdit.setText("Edit");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
 
         btnDelete.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -357,9 +380,85 @@ public class UserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_cmbRoleActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        // TODO add your handling code here:
+        edittedUser = new User();
+        setObjectToForm();
+        enableForm(true);
+
     }//GEN-LAST:event_btnAddActionPerformed
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        if(edittedUser.getId() < 0){
+            setFormtoObject();
+            enableForm(false);
+            userService.addNew(edittedUser);
+            refreshTable();
+        }else{
+            setFormtoObject();
+            enableForm(false);
+            userService.update(edittedUser);
+            refreshTable();
+        }
+            
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        int selectedIndex = tblUser.getSelectedRow();
+        if(selectedIndex >= 0){
+            edittedUser = list.get(selectedIndex);
+            setObjectToForm();
+            enableForm(true);
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        int selectedIndex = tblUser.getSelectedRow();
+        if(selectedIndex >= 0){
+            edittedUser = list.get(selectedIndex);
+            int input = JOptionPane.showConfirmDialog(this, "Do you want to proceed?", "Select an Option...",
+                                            JOptionPane.YES_NO_OPTION,JOptionPane.ERROR_MESSAGE);
+            System.out.println(input);
+            if(input == 0){
+            userService.delete(edittedUser);
+            }
+            refreshTable();
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        enableForm(false);
+        edittedUser = null;
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void refreshTable() {
+        list = userService.getUsers();
+        tblUser.revalidate();
+        tblUser.repaint();
+    }
+
+    private void setFormtoObject() {
+        edittedUser.setLogin(edtLogin.getText());
+        edittedUser.setName(edtName.getText());
+        edittedUser.setPassword(new String(edtPassword.getPassword()));
+        
+        if (rbtMale.isSelected()) {
+            edittedUser.setGender("M");
+        } else {
+            edittedUser.setGender("F");
+        }
+        edittedUser.setRole(cmbRole.getSelectedIndex());
+    }
+
+    private void setObjectToForm() {
+        edtLogin.setText(edittedUser.getLogin());
+        edtName.setText(edittedUser.getName());
+        edtPassword.setText(edittedUser.getPassword());
+        if (edittedUser.getGender().equals("M")) {
+            rbtMale.setSelected(true);
+        } else {
+            rbtFemale.setSelected(true);
+        }
+        cmbRole.setSelectedIndex(edittedUser.getRole());
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -387,6 +486,13 @@ public class UserPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void enableForm(boolean status) {
+        if(status == false){
+            edtLogin.setText("");
+            edtName.setText("");
+            edtPassword.setText("");
+            rbtMale.setSelected(true);
+            cmbRole.setSelectedIndex(0);
+        }
         edtLogin.setEnabled(status);
         edtName.setEnabled(status);
         edtPassword.setEnabled(status);
@@ -395,5 +501,6 @@ public class UserPanel extends javax.swing.JPanel {
         rbtMale.setEnabled(status);
         rbtFemale.setEnabled(status);
         cmbRole.setEnabled(status);
+        edtLogin.requestFocus();
     }
 }

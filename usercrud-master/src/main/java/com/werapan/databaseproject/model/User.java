@@ -49,6 +49,11 @@ public class User {
 
     public User() {
         this.id = -1;
+        this.gender = "M";
+        this.role = 0;
+        this.name = "";
+        this.login = "";
+        this.password = "";
     }
 
     public int getId() {
