@@ -4,17 +4,68 @@
  */
 package com.werapan.databaseproject.ui;
 
+import com.werapan.databaseproject.model.User;
+import com.werapan.databaseproject.service.UserService;
+import java.util.List;
+import javax.swing.table.AbstractTableModel;
+
 /**
  *
  * @author nonku
  */
 public class UserPanel extends javax.swing.JPanel {
 
+    private final UserService userService;
+    private final List<User> list;
+
     /**
      * Creates new form UserPanel
      */
     public UserPanel() {
         initComponents();
+        userService = new UserService();
+        
+        list = userService.getUsers();
+        tblUser.setModel(new AbstractTableModel() {
+            String[] columnNames = {"ID", "Login", "Name","Password", "Gender", "Role"};
+            @Override
+            public String getColumnName(int column) {
+                return columnNames[column];
+            }
+            
+            @Override
+            public int getRowCount() {
+               return list.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+               return 6;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                
+                User user = list.get(rowIndex);
+                switch (columnIndex) {
+                    case 0:
+                        return user.getId();
+                    case 1:
+                        return user.getLogin();
+                    case 2:
+                        return user.getName();
+                    case 3:
+                        return user.getPassword();
+                    case 4:
+                        return user.getGender();
+                    case 5:
+                        return user.getRole();
+                    default:
+                        return "Unknown";
+                }
+            }
+        });
+        
     }
 
     /**
@@ -43,7 +94,7 @@ public class UserPanel extends javax.swing.JPanel {
         btnSave = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblUser = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         btnAdd = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
@@ -200,8 +251,8 @@ public class UserPanel extends javax.swing.JPanel {
                         .addContainerGap())))
         );
 
-        jTable1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblUser.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        tblUser.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -212,7 +263,7 @@ public class UserPanel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblUser);
 
         jPanel2.setBackground(new java.awt.Color(204, 255, 204));
 
@@ -328,8 +379,8 @@ public class UserPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JRadioButton rbtFemale;
     private javax.swing.JRadioButton rbtMale;
+    private javax.swing.JTable tblUser;
     // End of variables declaration//GEN-END:variables
 }

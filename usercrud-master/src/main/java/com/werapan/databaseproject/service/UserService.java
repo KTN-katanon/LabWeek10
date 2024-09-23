@@ -21,5 +21,8 @@ public class UserService {
         }
         return null;
     }
-  
+  public List<User> getUsers(){
+      UserDao userDao = new UserDao();
+      return userDao.getAll(" user_login asc");
+  }
 }
