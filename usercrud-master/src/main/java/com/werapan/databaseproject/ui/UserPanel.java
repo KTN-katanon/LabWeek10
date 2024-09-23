@@ -66,6 +66,8 @@ public class UserPanel extends javax.swing.JPanel {
             }
         });
         
+        enableForm(false);
+        
     }
 
     /**
@@ -383,4 +385,15 @@ public class UserPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton rbtMale;
     private javax.swing.JTable tblUser;
     // End of variables declaration//GEN-END:variables
+
+    private void enableForm(boolean status) {
+        edtLogin.setEnabled(status);
+        edtName.setEnabled(status);
+        edtPassword.setEnabled(status);
+        btnClear.setEnabled(status);
+        btnSave.setEnabled(status);
+        rbtMale.setEnabled(status);
+        rbtFemale.setEnabled(status);
+        cmbRole.setEnabled(status);
+    }
 }
